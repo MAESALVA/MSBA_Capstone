@@ -47,7 +47,7 @@ tic()
 
 ```
 
-As we are not penalized for load many packages even though these are unncesary I load as many packages I can in order to don't have any issue at the moment to analyse the data and run the code.
+Here I load as many packages I can to don't have any issue at the moment to analyse the data and run the code.
 
 ```{r import census data}
 # import data
