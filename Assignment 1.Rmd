@@ -1,7 +1,7 @@
 ---
-title: "Project Assignment"
+title: "Project Assignment- Data Mining Class"
 author: "Estefany Alvarado"
-date: "2024-07-10"
+date: "2024-08-28"
 output: 
   html_document:
     number_sections: yes
