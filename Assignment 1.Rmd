@@ -1,5 +1,5 @@
 ---
-title: "Project Assignment- Data Mining Class"
+title: "GitHub Setup: Project Assignment- Data Mining Class- Summer 2024"
 author: "Estefany Alvarado"
 date: "2024-08-28"
 output: 
