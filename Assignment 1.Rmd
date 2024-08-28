@@ -1,0 +1,1074 @@
+---
+title: "Project Assignment"
+author: "Estefany Alvarado"
+date: "2024-07-10"
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    fig_width: 15
+    fig_height: 10
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Task I Exploratory Data Analysis (EDA)
+
+##  Package loading and data import
+
+```{r Load packages}
+#load packages 
+library(readr)
+library(dplyr)
+library(knitr)
+library(RWeka)
+library(rpart)
+library(rpart.plot)
+library(tictoc) 
+library(tidyverse)
+library(tidyr)
+library(psych)
+library(C50)
+library(e1071)
+library(matrixStats)
+library(ggplot2)
+library(caret)
+library(caretEnsemble)
+library(rminer)
+library(rmarkdown)
+library(kernlab)
+library(stats) 
+library (randomForest)
+tic()
+
+```
+
+As we are not penalized for load many packages even though these are unncesary I load as many packages I can in order to don't have any issue at the moment to analyse the data and run the code.
+
+```{r import census data}
+# import data
+census <- read.csv(file = "census.csv", stringsAsFactors = FALSE)
+```
+
+## Inspect the data
+
+```{r Structure of census data}
+#show structure
+str(census)
+```
+### Observations str
+
+The dataset contains 32561 obsevations with 15 variables as columns such as age, workclass, fnlwgt, education, education-num, marital-status, occupation, relationship, race, sex, capital-gain, capital-loss, hours-per-week, native-country, and y.
+
+The target variable is "y" which is categorical because it contains values like <=50K and >50K. This variable need to be re coded.
+
+*Numerical variables:
+age, fnlwgt, education-num, capital-gain, capital-loss, and hours-per-week
+
+*Categorical variables:
+workclass, education, marital-status, occupation, relationship, race, sex, native-country, and y
+
+## Recode target variable
+
+```{r Recode the target variable }
+# Recode the target variable to 0 and 1 (dummy variable)
+census$y <- ifelse(census$y == " <=50K", 0, 1)
+```
+
+### Comment target variable recoded
+
+After re code the target variable "y" the values are as follows:
+0: <=50K
+1: > 50K
+
+##  Transfor numerical and categorical variables
+
+```{r convert numerical and categorical variables}
+# transform factor variables
+census <- census %>% mutate(across(c(workclass,education,marital.status, occupation, relationship,race, sex, native.country, y), as.factor))
+
+# transform numerical variables
+census <- census %>% mutate(across(c(age, fnlwgt, education.num, capital.gain, capital.loss, hours.per.week), as.numeric))
+
+```
+
+```{r show new structure and summary}
+#show new structure
+str(census)
+
+#Show summary
+summary(census)
+```
+
+### Comment after variables tranformation
+
+This is what the data can tell us:
+
+There a diverse age demographic with a mean age of 38.58 years, ranging from 17 to 90 years.
+Most of them work in provate sector(22696).These people have varied educational backgrounds. Most of them have HS grad education level followed by some-college.Married-civ-spouse is the most common  marital status (14976) and Husband is the most common relationship status (13193). 
+
+The dataset is predominately white(27816) and primarily consists of individuals from the USA (29170). There are outliers in both capital.gain and capital.loss. Most individuals have zero gains or losses, some have significant amounts up to 99,999  in gains and up to 4356 in losses.
+
+The average workweek is around 40.44 hours most individuals working full-time (40 hrs)
+The data set has more individuals with income <=50K (24720 instances) than >50K (97841).
+
+I also noticed that some variables like workclass, native country and occupation have " ?" values. For better data analysis I'll change them to "unknown" values in the following steps.
+
+
+## Graphs for data presentation
+
+### Distribution of target variable
+
+```{r Distribution of target variable}
+
+# Plot distribution of target variable 'y'
+ggplot(census, aes(x = y)) +
+  geom_bar(fill = "lightblue", color="black") +
+  labs(title = "Distribution of target variable (y)", x = "Income", y = "Count")
+
+```
+#### Comment distribution of the target variable
+
+The bar plot shows that larger number of individuals fall in the <=50K category compared to the >50K category.
+
+### Target variable and numeric variables
+
+```{r Target variable and numeric variables, fig.height=20, fig.width=15}
+
+# Create box plots
+# Age vs Y
+p1 <- ggplot(census, aes(x=y, y=age)) + 
+      geom_boxplot() + 
+      ggtitle("Age vs Y")
+
+# Fnlwgt vs Y
+p2 <- ggplot(census, aes(x=y, y=fnlwgt)) + 
+      geom_boxplot() + 
+      ggtitle("Fnlwgt vs Y")
+
+# Education.num vs Y
+p3 <- ggplot(census, aes(x=y, y=education.num)) + 
+      geom_boxplot() + 
+      ggtitle("Education.num vs Y")
+
+# Capital.gain vs Y
+p4 <- ggplot(census, aes(x=y, y=capital.gain)) + 
+      geom_boxplot() + 
+      ggtitle("Capital.gain vs Y")
+
+# Hours.per.week vs Y
+p5 <- ggplot(census, aes(x=y, y=hours.per.week)) + 
+      geom_boxplot() + 
+      ggtitle("Hours.per.week vs Y")
+# Capital.loss vs Y
+p6 <- ggplot(census, aes(x=y, y=capital.loss)) + 
+      geom_boxplot() + 
+      ggtitle("Capital.loss vs Y")
+
+# Arrange the plots in a grid
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol=2)
+
+```
+
+#### Comment about boxplots
+
+I am not sure if I did correct but I couldn't use facet wrap without alter the number of observations just for those plots, sorry about that.
+
+0: <=50K
+1: > 50K
+
+We can see a higher median age for individuals with > 50K compared with those with <=50K. Also, the IQR is higher for people with >50k  indicating a wider spread of ages between them.And, there are outliers in both groups fo people around 70 or older.
+
+The median fnlwgt is quite similar between the two groups.Also, there is a high age variance in this variable  because of the outliers.
+
+Individuales with >50k tend to have higher education levels, as indicated by a higher median and a higher IQR.Suggesting a potential correlation between these two variables.
+
+Most individuals have a capital.gain of 0. Also, there are many outliers with higher capital gains in both groups but more in >50k.
+
+Individuals with y = >50 tend to work more hours per week on average, as indicated by a higher median and IQR.
+
+Similar to capital.gain, the vast majority of observations have a capital.loss of 0.there are many outliers with higher capital gains in both groups but more in <=50K.
+
+### Target variable and categorical variables
+
+```{r Target variable and categorical variables, fig.height=25, fig.width=30}
+# Create bar plots for each categorical variable
+# Workclass vs Y
+p1 <- ggplot(census, aes(x = workclass, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Workclass vs Y") 
+      
+
+# Education vs Y
+p2 <- ggplot(census, aes(x = education, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Education vs Y") 
+      
+# Marital Status vs Y
+p3 <- ggplot(census, aes(x = marital.status, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Marital Status vs Y") 
+      
+      
+# Occupation vs Y
+p4 <- ggplot(census, aes(x = occupation, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Occupation vs Y")  + 
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+      
+
+# Relationship vs Y
+p5 <- ggplot(census, aes(x = relationship, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Relationship vs Y") 
+     
+
+# Race vs Y
+p6 <- ggplot(census, aes(x = race, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Race vs Y")  
+      
+
+# Sex vs Y
+p7 <- ggplot(census, aes(x = sex, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Sex vs Y")  
+     
+
+# Native Country vs Y
+p8 <- ggplot(census, aes(x = native.country, fill = y)) + 
+      geom_bar(position = "dodge") + 
+      ggtitle("Native Country vs Y") + 
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+# Arrange the plots in a grid
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 2)
+```
+
+#### Observations from the plots
+
+0: <=50K
+1: > 50K
+
+The majority of individuals belong to the "Private" workclass, with a higher proportion of individuals with <=50k in this class.
+
+HS-grad and Some-college are the most common education levels.There are more <=50k individuals across almost all education levels.
+
+Married-civ-spouse shows a notable proportion of > 50K individuals compared to other statuses.Never-married and Divorced categories have a higher proportion of <=50K.
+
+Exec-managerial and Prof-specialty occupations have a more balanced distribution between <=50K and > 50K.Most other occupations have a higher proportion of <=50K.
+
+Husband and Wife categories show a more balanced distribution.Husband has a higher proportion of > 50K within those categories.
+Not in family and Own child categories have a higher proportion of <=50K.
+
+White is the predominant race.There are more males than females in the dataset and the vast majority of individuals are from the United States.
+
+## Correlation Analysis
+
+```{r correlation analysis using cor() }
+
+numeric_var <- census[, sapply(census, is.numeric)]
+
+# Compute the correlation matrix
+correlation_matrix <- cor(numeric_var)
+
+# Print the correlation matrix
+correlation_matrix
+
+
+```
+```{r correlation analysis using pairs.panels}
+
+pairs.panels(numeric_var)
+
+```
+### Comment pairs.panels and correlation
+
+Distributions:
+
+Age,fnlwgt, capital.gain and capital loss. These variables exhibit right-skewed distributions, indicating a larger number of smaller values. For example, the age distribution shows a larger number of younger individuals.
+
+fnlwgt: Very weak or no correlation with other variables.
+
+education.num shows that a significant number of individuals have a higher number of years of education, and hours per week indicate that most individuals work full-time hours.
+
+Correlation coefficients
+As age increases, there is a slight increase in education level, capital gain, capital loss, and hours worked per week.
+age and education.num (.04)
+age and capital.gain (.08)
+age and capital.loss (.06)
+age and hours.per.week (.07)
+
+Higher education levels are slightly associated with higher capital gains, capital losses, and more hours worked per week.
+education.num and capital.gain (.12)
+education.num and capital.loss (.08)
+education.num and hours.per week (.15)
+
+More hours worked per week are slightly associated with higher capital gains and losses
+capital.gain and hours.per.week (.08)
+capital.loos and hours.per.week (.05)
+
+Scatterplots:
+I can not see any linear relationship between the numeric variables.Some scatterplots, especially those involving capital.gain and capital.loss, show a few points far from the majority of the data, indicating the presence of outliers
+
+
+# Suppervised models covered in class, appropiate and inappropiate models
+
+Logistic Regression mentioned
+Whitebox methods: Decision Trees C5.0 and Probabilistic Naive Bayes
+Blackbox methods :Support Vector Machines (SVM) and K-Nearest Neighbors (KNN)
+Regression Models: Multiple Linear Regression (MLR- lm), Regression Tree (rpart), Model Tree (M5P)
+Generalized Linear Regression (GLM– glm)
+Neural Network (MultilayerPerceptron - RWeka) MLP
+Random Forests
+Bagging (Bootstrap Aggregation)
+Boosting – Adaboost/XGBoost
+
+* Appropriate models for binary classification (predicting income <=50K or >50K):
+
+Logistic Regression: because it directly models the probability of belonging to a specific class (0 or 1)
+Decision Trees: can handle both continuous and categorical outcome variables, and can model non-linear relationships between predictors and the target variable.
+Probabilistic Naive Bayes: If the assumption of feature independence holds true in the data this model can be effective, especially with limited data. I will evaluate its efectiveness.
+Support Vector Machines (SVM):Powerful for finding separation boundaries between income classes
+Neural Networks MLP:Can learn complex patterns from data and might outperform simpler models with enough data and proper architecture design
+Random Forests: method combining multiple decision trees for improved accuracy and robustness to outliers.
+Bagging (Bootstrap Aggregation): It can improve model stability and reduce variance.
+Boosting – Adaboost/XGBoost: sequentially train models, focusing on data points that previous models misclassified.
+
+* Inappropriate models:
+
+K-Nearest Neighbors (KNN): While  can be used for classification, it doesn't inherently model probabilities for each class. 
+Multiple Linear Regression (MLR)
+Regression Tree (rpart)
+Model Tree (M5P)
+Generalized Linear Regression (GLM) when used for continuous outcomes.
+
+# Task II Data Preparation
+
+## Check missing values
+
+```{r Data cleaning: check missing values}
+sum(is.na(census))
+```
+It seems we dont have missing values.
+
+## Check "?" values
+
+```{r Check unknown values "?" }
+# Count "?" values in the occupation column
+sum(census$occupation == " ?")
+sum(census$workclass == " ?")
+sum(census$native.country == " ?")
+```
+I identified them before but now I am going to replace them with "unknown".
+
+```{r Replace "?" values}
+# Replace "?" with "Unknown" in the occupation column
+census$occupation <- as.character(census$occupation)
+census$occupation[census$occupation == " ?"] <- "Unknown"
+census$occupation <- as.factor(census$occupation)
+
+# Verify the changes
+table(census$occupation)
+
+
+# Replace "?" with "Unknown" in the workclass column
+census$workclass <- as.character(census$workclass)
+census$workclass[census$workclass == " ?"] <- "Unknown"
+census$workclass <- as.factor(census$workclass)
+
+# Verify the changes
+table(census$workclass)
+
+# Replace "?" with "Unknown" in the native.country column
+census$native.country <- as.character(census$native.country)
+census$native.country[census$native.country == " ?"] <- "Unknown"
+census$native.country <- as.factor(census$native.country)
+
+# Verify the changes
+table(census$native.country)
+
+```
+## Target variable: count and percentages whole input data frame
+
+```{r count and percentages whole input data frame}
+table(census$y)
+prop.table(table(census$y))
+```
+
+## Split the data in to training and tetsing set
+
+```{r Split the data intro training and testing set}
+
+# Train test split 80/20
+set.seed(123)
+
+trainIndex <- createDataPartition(census$y, p=0.8, list=FALSE)
+trainData <-  census[trainIndex,]
+testData <-  census[-trainIndex,]
+
+trainTarget <- census[trainIndex,15]
+testTarget <- census[-trainIndex,15]
+
+# Ensure the target variable in training and test sets is a factor
+trainData$y <- as.factor(trainData$y)
+testData$y <- as.factor(testData$y)
+```
+
+## Summary of the train and test
+    
+```{r Summary train and test }
+summary(trainData)
+summary(testData)
+
+```
+## do our train x and train target x sizes match?
+```{r train target x sizes match }
+nrow(trainData)
+length(trainTarget)
+```
+## do our test x and test target x sizes match?
+
+```{r test target x sizes match}
+nrow(testData)
+length(testTarget)
+```
+## check distribution of the target in train and test
+
+```{r distribution of the target in train and test}
+
+round(prop.table(table((trainTarget))),2)
+round(prop.table(table((testTarget))),2)
+
+table(trainData$y)
+table(testData$y)
+```
+
+Now the data is ready for modeling! 
+
+# Task III - Model Building
+
+Based on the preference of interpretability over performance I chose these models: decision tree, KSVM with default kernal, laplacedot and c=10, Naive bayes and Random Forest models . Additionally, for binary classification, appropriate metrics include: Accuracy, precision, recall, F1 score 
+
+## Decision Tree Model
+
+```{r Decision Tree Model}
+# Train C5.0 model
+c50_model <- C5.0(y ~ ., data = trainData)
+
+# Get feature importance
+importance <- varImp(c50_model)
+importance
+
+```
+
+### Generate predictions for the training dataset
+
+```{r C5.0 Generate predictions for the training dataset}
+# C5.0 Predictions training set
+c50_pred <- predict(c50_model, newdata = trainData)
+
+```
+
+### Generate predictions for the testing dataset
+
+```{r C5.0 Generate predictions for the testing dataset}
+# C5.0 Predictions testing set
+c50_pred_t <- predict(c50_model, newdata = testData)
+```
+
+### Generate confusion Matrix for the training dataset
+
+```{r C5.0 Generate confusion Matrix for the training dataset}
+# Evaluation
+confusionMatrix(c50_pred, trainData$y)
+
+```
+
+### Generate confusion Matrix for the testing dataset
+
+```{r C5.0 Generate confusion Matrix for the testing dataset}
+
+# Evaluation
+confusionMatrix(c50_pred_t, testData$y)
+```
+### Generate evaluation metrics
+
+#### Metrics
+
+```{r Set the metrics}
+evaluation_metrics <- c("ACC","F1","PRECISION","TPR")
+```
+
+#### Evaluation metrics in train set
+
+```{r C5.0 Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+## Train set
+mmetric(trainData$y, c50_pred, metric=evaluation_metrics)
+
+```
+
+#### Evaluation metrics in testing set
+
+```{r C5.0 Generate evaluation metrics of accuracy, f1, precision, recall for all models in test set}
+## Test set
+mmetric(testData$y, c50_pred_t, metric=evaluation_metrics)
+
+```
+
+## KSVM model
+
+### Train KSVM model with default settings
+
+```{r KSVM model}
+ksvm_model <- ksvm(y ~ .,data = trainData)
+
+```
+
+### Generate predictions for the training dataset
+
+```{r KSVM Generate predictions for the training dataset}
+# Predictions training set
+ksvm_pred <- predict(ksvm_model, trainData)
+
+```
+
+### Generate predictions for the testing dataset
+
+```{r KSVM Generate predictions for the testing dataset}
+# Predictions testing set
+ksvm_pred_t <- predict(ksvm_model, testData)
+```
+
+
+### Generate confusion Matrix for the training dataset
+
+```{r KSVM Generate confusion Matrix for the training dataset}
+# Evaluation
+confusionMatrix(ksvm_pred, trainData$y )
+
+```
+
+### Generate confusion Matrix for the testing dataset
+
+```{r KSVM Generate confusion Matrix for the testing dataset}
+# Evaluation
+confusionMatrix(ksvm_pred_t, testData$y )
+
+```
+
+### Generate evaluation metrics
+
+#### Evaluation metrics in train set
+
+```{r KSVM Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+mmetric(trainData$y, ksvm_pred, metric=evaluation_metrics)
+```
+
+#### Evaluation metrics in test set
+
+```{r KSVM Generate evaluation metrics of accuracy, f1, precision, recall for all models in test set}
+mmetric(testData$y, ksvm_pred_t, metric=evaluation_metrics)
+```
+
+## KSVM model 2
+
+### Train the KSVM models with laplacian kernel
+
+```{r}
+## Linear Kernel
+ksvm_l <- ksvm(y ~ ., data = trainData, kernel = "laplacedot")
+
+```
+
+
+### Generate predictions for the training dataset
+
+```{r KSVM laplacedot Generate predictions for the training dataset}
+# Predictions training set
+ksvm_pred_l <- predict(ksvm_l, trainData)
+
+```
+
+### Generate predictions for the testing dataset
+
+```{r KSVM laplacedot Generate predictions for the testing dataset}
+# Predictions testing set
+ksvm_pred_t_l <- predict(ksvm_l, testData)
+```
+
+
+### Generate confusion Matrix for the training dataset
+
+```{r KSVM laplacedot Generate confusion Matrix for the training dataset}
+# Evaluation
+confusionMatrix(ksvm_pred_l, trainData$y )
+
+```
+
+
+### Generate confusion Matrix for the testing dataset
+
+```{r KSVM laplacedot Generate confusion Matrix for the testing dataset}
+# Evaluation
+confusionMatrix(ksvm_pred_t_l, testData$y )
+
+```
+
+### Generate evaluation metrics
+
+#### Evaluation metrics in train set
+
+```{r KSVM laplacedot Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+mmetric(trainData$y, ksvm_pred_l, metric=evaluation_metrics)
+```
+
+#### Evaluation metrics in test set
+
+```{r KSVM laplacedot  Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+mmetric(testData$y, ksvm_pred_t_l, metric=evaluation_metrics)
+```
+## KSVM model 3
+
+### Train the KSVM models with different cost value
+
+```{r}
+## Linear Kernel
+ksvm_c <- ksvm(y ~ ., data = trainData, C= 10)
+
+```
+
+
+### Generate predictions for the training dataset
+
+```{r KSVM C 10 Generate predictions for the training dataset}
+# Predictions training set
+ksvm_pred_c <- predict(ksvm_c, trainData)
+
+```
+
+### Generate predictions for the testing dataset
+
+```{r KSVM C 10 Generate predictions for the testing dataset}
+# Predictions testing set
+ksvm_pred_t_c <- predict(ksvm_c, testData)
+```
+
+
+### Generate confusion Matrix for the training dataset
+
+```{r KSVM C 10 Generate confusion Matrix for the training dataset}
+# Evaluation
+confusionMatrix(ksvm_pred_c, trainData$y )
+
+```
+
+### Generate confusion Matrix for the testing dataset
+
+```{r KSVM C 10 Generate confusion Matrix for the testing dataset}
+# Evaluation
+confusionMatrix(ksvm_pred_t_c, testData$y )
+
+```
+
+### Generate evaluation metrics
+
+#### Evaluation metrics in train set
+
+```{r KSVM C 10 Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+mmetric(trainData$y, ksvm_pred_c, metric=evaluation_metrics)
+```
+#### Evaluation metrics in test set
+
+```{r KSVM C 10  Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+mmetric(testData$y, ksvm_pred_t_c, metric=evaluation_metrics)
+```
+
+## Naive Bayes model
+
+```{r Naive Bayes model}
+# Train the Naive Bayes model
+nb_model <- naiveBayes(y ~., data = trainData)
+```
+
+### Generate predictions for the training dataset
+
+```{r Naive Bayes Generate predictions for the training dataset}
+# Naive Bayes Predictions training set
+nb_pred <- predict(nb_model, newdata = trainData)
+
+```
+
+### Generate predictions for the testing dataset
+
+```{r Naive Bayes Generate predictions for the testing dataset}
+# Naive Bayes Predictions testing set
+nb_pred_t <- predict(nb_model, newdata = testData)
+```
+
+### Generate confusion Matrix for the training dataset
+
+```{r Naive Bayes Generate confusion Matrix for the training dataset}
+# Evaluation
+confusionMatrix(nb_pred, trainData$y)
+
+```
+
+### Generate confusion Matrix for the testing dataset
+
+```{r Naive Bayes Generate confusion Matrix for the testing dataset}
+# Evaluation
+confusionMatrix(nb_pred_t, testData$y)
+```
+### Generate evaluation metrics
+
+#### Evaluation metrics in train set
+
+```{r Naive Bayes Generate evaluation metrics in train set}
+## Train set
+mmetric(trainData$y, nb_pred, metric=evaluation_metrics)
+
+```
+#### Evaluation metrics in testing set
+
+```{r Naive Bayes Generate evaluation metrics in test set}
+## Test set
+mmetric(testData$y, nb_pred_t, metric=evaluation_metrics)
+
+```
+
+## Random Forest model
+
+I used the randomForest function instead of "train" because the latter took hours to train the model, even with ntree=10.
+
+```{r Random forest model}
+# Random Forest
+model_rf <- randomForest(y ~ ., data = trainData, ntree = 100) 
+model_rf
+
+importance_values <- importance(model_rf)
+importance_values
+
+```
+
+### Generate predictions for the training dataset
+
+```{r RF Generate predictions for the training dataset}
+# RF Predictions for training set 
+rf_pred <- predict(model_rf, trainData)
+
+```
+
+### Generate predictions for the testing dataset
+
+```{r RF Generate predictions for the testing dataset}
+# RF Predictions for testing set 
+rf_pred_t <- predict(model_rf, testData)
+```
+
+### Generate confusion Matrix for the training dataset
+
+```{r RF Generate confusion Matrix for the training dataset}
+# Evaluation
+confusionMatrix(rf_pred, trainData$y)
+
+```
+
+### Generate confusion Matrix for the testing dataset
+
+```{r RF Generate confusion Matrix for the testing dataset}
+# Evaluation
+confusionMatrix(rf_pred_t, testData$y)
+```
+
+### Generate evaluation metrics
+
+#### Evaluation metrics in train set
+
+```{r RF Generate evaluation metrics of accuracy, f1, precision, recall for all models in train set}
+## Train set
+mmetric(trainData$y, rf_pred, metric=evaluation_metrics)
+
+```
+
+#### Evaluation metrics in testing set
+
+```{r Naive Bayes Generate evaluation metrics of accuracy, f1, precision, recall for all models in test set}
+## Test set
+mmetric(testData$y, rf_pred_t, metric=evaluation_metrics)
+
+```
+
+# Task IV - Reflections 
+
+## Model performance of each model built
+
+I applied several machine learning modelsto predict whether an individual's income exceeds $50K per year. The dataset consisted of 32,561 observations with 15 features, including age, workclass, education, marital status, occupation, relationship, race, sex, capital gain, capital loss, hours worked per week, and native country. The target variable, y, indicated income category as either <=50K or >50K.Below are the evaluation metrics and analysis for each model:
+
+### C5.0 Decision Tree Model
+
+```{r}
+## Train set
+mmetric(trainData$y, c50_pred, metric=evaluation_metrics)
+```
+
+```{r}
+## Test set
+mmetric(testData$y, c50_pred_t, metric=evaluation_metrics)
+```
+
+* Training Accuracy: 88.51%
+* Testing Accuracy: 86.58%
+
+The C5.0 model demonstrated good performance with a balanced accuracy in both training and testing sets. Also, presented high precision, and recall metrics for the <=50K class, indicating it is good at correctly identifying lower-income individuals.However, it had lower precision and recall for the >50K class, suggesting some misclassification of higher-income individuals.
+
+### K Support Vector Machine (KSVM) with RBF Kernel
+
+```{r }
+##train set
+mmetric(trainData$y, ksvm_pred, metric=evaluation_metrics)
+```
+
+```{r }
+## Test set
+mmetric(testData$y, ksvm_pred_t, metric=evaluation_metrics)
+```
+
+* Training Accuracy: 86.70%
+* Testing Accuracy: 85.63%
+
+The SVM model with RBF kernel showed good recall for the <=50K class but struggled with the >50K class, indicating it is better at identifying lower-income individuals but less accurate for higher-income individuals.
+
+### K Support Vector Machine (KSVM) with Laplace Kernel
+
+
+```{r}
+## Train set
+mmetric(trainData$y, ksvm_pred_l, metric=evaluation_metrics)
+
+```
+
+
+```{r}
+## Test set
+mmetric(testData$y, ksvm_pred_t_l, metric=evaluation_metrics)
+```
+* Training Accuracy: 86.76%
+* Testing Accuracy: 85.33%
+
+This SVM variant had similar performance to the RBF kernel, with a slight drop in testing accuracy.
+
+### k Support Vector Machine (kSVM) with Linear Kernel and C=10
+
+```{r}
+## Train set
+mmetric(trainData$y, ksvm_pred_c, metric=evaluation_metrics)
+```
+
+
+```{r}
+## Test set
+mmetric(testData$y, ksvm_pred_t_c, metric=evaluation_metrics)
+```
+* Training Accuracy: 89.07%
+* Testing Accuracy: 85.14%
+
+This model achieved the highest training accuracy among the SVM models and maintained a high recall for the <=50K class, but had lower testing accuracy and recall for the >50K class.
+
+### Naive Bayes Model
+
+```{r}
+## Train set
+mmetric(trainData$y, nb_pred, metric=evaluation_metrics)
+```
+
+
+```{r}
+## Test set
+mmetric(testData$y, nb_pred_t, metric=evaluation_metrics)
+```
+* Training Accuracy: 83.09%
+* Testing Accuracy: 82.26%
+
+The Naive Bayes has lower accuracy in both training and testing set among the previous models.Also,  has lower precision and recall for the >50K class, indicating it was less effective in identifying higher-income individuals.
+
+### Random Forest Model
+
+```{r}
+## Train set
+mmetric(trainData$y, rf_pred, metric=evaluation_metrics)
+```
+
+```{r}
+## Test set
+mmetric(testData$y, rf_pred_t, metric=evaluation_metrics)
+```
+* Training Accuracy: 95.97%
+* Testing Accuracy: 86.23%
+
+The Random Forest model excelled in the training phase with very high accuracy and has good performance in terms of balanced accuracy during testing.
+
+Based on this analysis the C5.0 Decision Tree model exhibits better testing performance metrics compared to the Random Forest model. However, the Random Forest model excelled in the training phase with very high accuracy and has good performance in terms of balanced accuracy during testing, making it the most robust and reliable model overall for predicting income categories in this dataset.
+
+In conclusion, the Random Forest model was the top performer, providing the best balance between training and testing performance, followed by the C5.0 and KSVM models, with Naive Bayes being the least effective among the models tested.
+
+## Which model performed the best/worst. Ideally use a table to make this easy to read. 
+
+### Table comparison
+
+```{r}
+model_performance <- data.frame(
+  Model = c("C5.0 Decision Tree", "C5.0 Decision Tree", "kSVM (RBF Kernel)", "kSVM (RBF Kernel)",
+            "kSVM (Laplace Kernel)", "kSVM (Laplace Kernel)", "kSVM (Linear Kernel, C=10)", "kSVM (Linear Kernel, C=10)",
+            "Naive Bayes", "Naive Bayes", "Random Forest", "Random Forest"),
+  Dataset = rep(c("Training", "Testing"), 6),
+  Accuracy = c(88.51, 86.58, 86.70, 85.63, 86.76, 85.33, 89.07, 85.14, 83.09, 82.26, 95.97, 86.23),
+  F1_Score_LowIncome = c(92.57, 91.36, 91.56, 90.88, 91.61, 90.69, 92.99, 90.49, 89.35, 88.82, 97.37, 91.14),
+  F1_Score_HighIncome = c(74.65, 70.01, 68.67, 66.06, 68.72, 65.44, 75.26, 66.04, 58.90, 57.05, 91.39, 69.08),
+  Precision_LowIncome = c(90.91, 89.39, 88.36, 87.66, 88.33, 87.51, 90.66, 88.01, 85.58, 85.14, 96.53, 89.07),
+  Precision_HighIncome = c(79.60, 75.78, 79.35, 76.55, 79.73, 75.65, 82.76, 73.40, 70.99, 68.42, 94.08, 75.17),
+  Recall_LowIncome = c(94.29, 93.41, 95.00, 94.36, 95.13, 94.11, 95.44, 93.10, 93.48, 92.84, 98.23, 93.31),
+  Recall_HighIncome = c(70.29, 65.05, 60.53, 58.10, 60.39, 57.65, 69.01, 60.01, 50.33, 48.92, 88.86, 63.90)
+)
+
+# Print the table
+kable(model_performance, format = "markdown", 
+      col.names = c("Model", "Dataset", "Accuracy (%)", "F1 Score (<=50K) (%)", 
+                    "F1 Score (>50K) (%)", "Precision (<=50K) (%)", "Precision (>50K) (%)", 
+                    "Recall (<=50K) (%)", "Recall (>50K) (%)"))
+
+```
+
+### Best model
+Random Forest!
+This model achieved the highest accuracy (95.97% on training and 86.23% on testing), and balanced performance across all metrics. It showed the highest precision and recall for both classes, making it the best model for predicting the target variable.
+
+### Worst model
+Naive Bayes!
+This model had the lowest accuracy (83.09% on training and 82.26% on testing) and the lowest F1 score for the >50K class. It showed a higher false positive rate and lower precision and recall for the >50K class, indicating it was less effective in identifying >50k individuals.
+
+## Which features appear to be the most useful to predict y? If you had to choose just one feature to predict the target which would it be?
+
+```{r}
+# feature importance in Random Forest model
+
+# Convert the importance values to a data frame
+importance_df <- data.frame(Feature = rownames(importance_values), 
+                            Importance = importance_values[, "MeanDecreaseGini"])
+
+# Order the features by importance in decreasing order
+importance_df <- importance_df[order(-importance_df$Importance), ]
+importance_df
+
+# Feature importance in C5.0 model
+importance
+
+```
+I extracted the predictor importance in C5.0 and Random Forest models in they respective codes above. 
+
+Based on the Random forest (the best model), the 3 most useful predictors in predicting whether an individual's income exceeds $50K per year are: capital.gain, marital.status and age.
+
+Interestingly, both RF and C5.0 agree that capital gain has the highest score, making it the best choice for predicting income.
+
+## How much better was your best model than a majority rule classifier? Than a random classifier?
+
+### Majority rule classifier
+
+Predicts the most common class (<=50K)
+
+```{r}
+# Calculate the majority class in the training dataset
+majority_class <- as.numeric(names(which.max(table(trainData$y))))
+
+# Calculate the accuracy of the majority rule classifier
+majority_accuracy <- mean(testData$y == majority_class)
+majority_accuracy
+```
+The Random Forest accuracy is 86.23% outperforming the majority class accuracy in 10.31%
+
+### Random classifier
+
+Predicts classes based on their distribution in the training dataset
+
+```{r}
+# Calculate the class distribution in the training dataset
+class_distribution <- prop.table(table(trainData$y))
+
+# Calculate the expected accuracy of the random classifier
+random_accuracy <- sum(class_distribution^2)
+random_accuracy
+```
+The Random Forest improves the accuracy by approximately 21.79% percentage points over the random classifier. 
+
+## Interpret what mistakes in predictions would mean to marketing financial products to individuals.
+
+### Prediction errors
+
+#### False Positives (Type I Error)
+
+The model predicts that an individual's income is >50K (eligible for premium financial products) when in reality their income is <=50K. 
+- It would implicate in wrong allocation of resources and marketing cost to people who is not our target. 
+- It can also affect the customer experience/satisfaction by being offered inappropriate products that don't satisfy their needs.
+- Lower conversion rates for the premium financial products.
+
+#### False Negatives (Type II Error)
+The model predicts that an individual's income is <=50K when in reality their income is >50K.
+- Higher churn rates!
+- Since the customer targets are not identified correctly the company might experience lose in sales opportunities to costumer who can afford their premium financial products. 
+-Competitors financial institutions might capture these high-value customers that we misidentify.
+- It can also affect the customer experience/satisfaction by not being offered premium financial products that satisfy their needs.
+
+## If some with low income was categorized as having high income and a high income product was marketed to them what are the ramifications of this if they are unable to repay the loan?
+
+This ramifications can affect both the individual an the financial institution.
+
+### Ramifications for the individual
+
+- Debt accumulation that can not manage or repay.
+- Inability to make payments on time can lead to defaulting on loans
+- That can impact in a negative credit reporting leading to a significant drop in the individual's credit score.
+- A lower credit score makes it difficult to obtain future credit or loans
+- Persistent non payment may result in  legal action to recover the owed amount.
+
+*All these consequences can affect their emotional and psychological balance for bad.*
+
+### Ramifications for the financial institution
+
+- Higher churn rates!
+- The institution may face significant financial losses due to defaults on high-income products marketed to individuals unable to repay.
+- Additional costs in efforts to collect overdue amounts and recover debts through legal ends.
+- Damage the institution's reputation and loss customer trust, negative word-of-mouth
+- The company may be required to improve their lending practices and evaluations.
+- Regulatory bodies may impose fines and penalties if mis selling practices are found to be systemic or negligent.
+
+## What if a high income individual has a less profitable financial product marketed to them because we accidentally predict them to have low income?
+
+### Ramifications for the individual
+
+- The individual might not receive the financial services and products that match their financial needs.
+- They may miss out on opportunities for better financial growth
+- They may feel undervalued because they are not offered products that align with their financial status.
+- A mismatch between their needs and the products offered can lead to a poor customer experience.
+- They will switch to competitors who recognize their financial status and offer more suitable and profitable products.
+
+### Ramifications for the financial institution
+
+- Higher churn rates!
+- High-income customers not identified may have a lower lifetime value due to limited product usage.
+- The institution may be perceived as inefficient in apply customer segmentation and targeting.
+- Dissatisfied high-income customers can spread negative feedback.
+
+## Was the model better at predicting those with low income or high income?
+
+The model has higher precision for predicting low-income individuals (89.07%) compared to high-income individuals (75.17%). 
+The recall for low-income individuals is significantly higher (93.31%) than for high-income individuals (63.90%). 
+F1 score is higher for low-income predictions (91.14%) than for high-income predictions (69.08%). 
+
+The Random Forest model is better at predicting low-income individuals compared to high-income individuals. 
+
+Both the RF and the second best model C5.0 based on the performance metrics are  better at predicting low-income individuals compared to high-income individuals. XGBoost model might improve the performance metrics a little bit in the testing set.
