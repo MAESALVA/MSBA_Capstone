@@ -48,9 +48,50 @@ The models were evaluated using the Area Under the Receiver Operating Characteri
   
   - Identified distinct risk profiles (high, medium, and low risk) with detailed characteristics.
     
-  - Enhanced profiles with simulations and summarized them using repayment and profitability metrics.
+  - Enhanced profiles with simulations:
+    - Simulated repayment delays for each risk category.
+    - Summarized enriched personas with profitability and repayment metrics.
+    - Calculated loan profitability metrics to evaluate financial performance across risk categories.
+
+* Cross-Validation Results: Achieved an average AUC of 0.7350004 across 5 folds, validating the robustness of the model parameters and performance.
 ___
 
+### Business Conclusions and Recommendations
+Based on the identified risk profiles (high, medium, and low risk), the following insights and strategies were developed:
+
+**Low Risk Clients:**
+
+- **Profile:** Stable employment, high external scores, and low credit-to-income ratio.
+
+- **Behavior:** Minimal repayment delays (2 days on average).
+
+- **Recommendation:** Offer premium loans with low interest rates and flexible terms. Target high-income, educated clients for investment products.
+
+**Medium Risk Clients:**
+
+- **Profile:** Moderate external scores, medium loan amounts, and some employment gaps.
+
+ **Behavior:** Moderate repayment delays (10 days on average).
+
+- **Recommendation:** Provide standard loans with moderate interest rates. Introduce flexible repayment plans and credit counseling.
+
+**High Risk Clients:**
+
+- **Profile:** Low external scores, high credit-to-income ratio, and unstable employment.
+
+- **Behavior:** Significant repayment delays (30 days on average).
+
+- **Recommendation:** Limit loans to collateral-based products. Focus on short-term plans and require stricter credit checks. Introduce financial literacy programs to improve repayment behavior.
+
+**Profitability Metrics for Risk Categories:**
+
+ - Low Risk: Expected net profit of $40,527 and ROI of 7%.
+
+ - Medium Risk: Expected net profit of $15,230 and ROI of 3%.
+
+ - High Risk: Negative net profit of -$53,123 and ROI of -12%.
+
+___
 
 ### The Business Value of the Solution
 This project provides substantial value to Home Credit Group by:
