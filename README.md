@@ -2,7 +2,7 @@
 
 ### Summary of Business Problem and Project Objective
 
-The **Home Credit Default Risk** project aims to enhance loan accessibility for individuals with limited or no credit history. These individuals often belong to underserved populations, leaving them vulnerable to unfair lending practices. By leveraging data from the application_train and application_test datasets, Home Credit seeks to improve financial inclusion by accurately assessing repayment capabilities. The project aims to develop predictive models that ensure fair and accurate loan approval decisions, minimizing risks for lenders and borrowers.
+The **Home Credit Default Risk** project aims to enhance loan accessibility for individuals with limited or no credit history. These individuals often belong to underserved populations, leaving them vulnerable to unfair lending practices. By leveraging the datasets provided, Home Credit seeks to improve financial inclusion by accurately assessing repayment capabilities. The project aims to develop predictive models that ensure fair and accurate loan approval decisions, minimizing risks for lenders and borrowers.
 
 ---
 
@@ -75,6 +75,7 @@ This project provides substantial value to Home Credit Group by:
 
 * **Evaluation Complexity:** Interpreting the AUC-ROC score in the context of business decisions and understanding trade-offs between sensitivity and specificity was critical.
 
+* **Time Constraints:** The analysis prioritized the application_train and application_test datasets to ensure a focused and thorough exploration within the available timeframe. While this approach allowed for a detailed evaluation of the primary datasets, incorporating additional datasets could be a valuable next step for further enhancing the model's predictive power.
 ---
 
 ### What I Learned in the Project
