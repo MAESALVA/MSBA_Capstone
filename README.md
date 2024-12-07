@@ -2,17 +2,34 @@
 
 ### Summary of Business Problem and Project Objective
 
-**Note:** This project is no longer maintained and has been discontinued. No further updates or support will be provided. Feel free to fork the repository and make any necessary changes on your own.
+The **Home Credit Default Risk** project aims to enhance loan accessibility for individuals with limited or no credit history. These individuals often belong to underserved populations, leaving them vulnerable to unfair lending practices. By leveraging data from the application_train and application_test datasets, Home Credit seeks to improve financial inclusion by accurately assessing repayment capabilities. The project aims to develop predictive models that ensure fair and accurate loan approval decisions, minimizing risks for lenders and borrowers.
 
 ---
 
-### Introduction
+### Solution to the Business Problem
 
-Use this template if you need a quick developer / data science portfolio! Based on a Minimal Jekyll theme for GitHub Pages.
+The solution implemented machine learning models to accurately predict repayment abilities. A variety of statistical methods, including naive bayes, logistic regression, random forests, and advanced techniques like gradient boosting models (XGBoost and LightGBM), were used.
 
-### Installation
+The models were evaluated based on the Area Under the Receiver Operating Characteristic (AUC-ROC) curve. After feature engineering, applying class weights, and grid search for the best parameters, the LightGBM model emerged as the best-performing model, achieving an average AUC of 0.7350004 and Kaggle Score of 0.703 (Private Score).
 
-See full step by step tutorial [on Medium](https://medium.com/@evanca/set-up-your-portfolio-website-in-less-than-10-minutes-with-github-pages-d0efa8ff56fd).
+Key outputs of the solution include:
+
+1. Identification of three distinct risk profiles: high, medium, and low risk, along with their characteristics defined as persona profiles.
+
+2. Enhanced persona profiles using simulations, including:
+* Simulating repayment delay days based on risk categories.
+* Summarizing enriched personas with profitability and repayment metrics.
+* Loan profitability metrics to evaluate financial performance across risk categories.
+
+### Contribution to the Project
+
+* Conducted data exploration and preprocessing, including handling missing values, encoding categorical features, and scaling numerical variables.
+
+* Engineered meaningful features to improve the model's predictive capabilities.
+
+* Built and fine-tuned multiple machine learning models, including logistic regression and tree-based algorithms (Random Forest and XGBoost).
+* 
+* Analyzed model performance using the AUC-ROC metric and selected the best-performing model for deployment.
 ___
 
 You can use the editor on GitHub to maintain and preview the content for your website in Markdown files.
