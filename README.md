@@ -12,7 +12,7 @@ The solution implemented machine learning models to accurately predict repayment
 
 The models were evaluated based on the Area Under the Receiver Operating Characteristic (AUC-ROC) curve. After feature engineering, applying class weights, and grid search for the best parameters, the LightGBM model emerged as the best-performing model, achieving an average AUC of 0.7350004 and Kaggle Score of 0.703 (Private Score).
 
-Key outputs of the solution include:
+**Key outputs of the solution include:**
 
 1. Identification of three distinct risk profiles: high, medium, and low risk, along with their characteristics defined as persona profiles.
 
@@ -20,6 +20,8 @@ Key outputs of the solution include:
   * **Simulating repayment delay days** based on risk categories.
   * Summarizing enriched personas with **profitability and repayment metrics.**
   * **Loan profitability metrics** to evaluate financial performance across risk categories.
+
+---
 
 ### Contribution to the Project
 
@@ -54,6 +56,8 @@ This project provides substantial value to Home Credit Group by:
   
 * **Profitability Insights:** Providing profitability and repayment metrics for each persona helps refine loan strategies and enhance overall financial outcomes.
 
+---
+
 ### Difficulties Encountered Along the Way
 
 * **Class Imbalance:** The dataset exhibited a significant imbalance, with far fewer defaulters compared to non-defaulters. Techniques such as resampling methods (oversampling, undersampling, and both) and class weighting were necessary to address this.
@@ -64,20 +68,22 @@ This project provides substantial value to Home Credit Group by:
 
 * **Evaluation Complexity:** Interpreting the AUC-ROC score in the context of business decisions and understanding trade-offs between sensitivity and specificity was critical.
 
+---
+
 ### What I Learned in the Project
 
-* **Technical Skills:**
+**Technical Skills:**
 
 * Feature engineering and data preprocessing techniques.
 * Implementation and tuning of machine learning models using R.
 * Evaluation of models using metrics like AUC-ROC and precision-recall.
 
-* **Business Insights:**
+**Business Insights:**
 
 * The importance of tailoring financial products to underserved populations.
 * Balancing technical accuracy with business practicality in predictive modeling.
 
-* **Personal Growth:**
+**Personal Growth:**
   
 * Problem-solving in the face of data challenges, such as missing values and class imbalances.
 * Communicate technical results to non-technical stakeholders.
