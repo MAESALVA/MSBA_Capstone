@@ -17,9 +17,9 @@ Key outputs of the solution include:
 1. Identification of three distinct risk profiles: high, medium, and low risk, along with their characteristics defined as persona profiles.
 
 2. Enhanced persona profiles using simulations, including:
-* Simulating repayment delay days based on risk categories.
-* Summarizing enriched personas with profitability and repayment metrics.
-* Loan profitability metrics to evaluate financial performance across risk categories.
+  * **Simulating repayment delay days** based on risk categories.
+  * Summarizing enriched personas with **profitability and repayment metrics.**
+  * **Loan profitability metrics** to evaluate financial performance across risk categories.
 
 ### Contribution to the Project
 
@@ -30,39 +30,34 @@ Key outputs of the solution include:
 * Built and fine-tuned multiple machine learning models, including logistic regression and tree-based algorithms (Random Forest and XGBoost).
 * 
 * Analyzed model performance using the AUC-ROC metric and selected the best-performing model for deployment.
+
+
 ___
 
 You can use the editor on GitHub to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+### The Business Value of the Solution
+This project provides substantial value to Home Credit Group by:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* **Improving Financial Inclusion:** Enabling underserved individuals to access loans fairly based on accurate repayment predictions.
+  
+* **Reducing Default Risk:** Helping Home Credit make informed decisions, minimizing financial risks.
+  
+* **Persona-Based Strategies:** By defining risk profiles, Home Credit can tailor loan products and repayment plans to suit specific borrower characteristics, ensuring financial stability for both parties.
+  
+* **Profitability Insights:** Providing profitability and repayment metrics for each persona helps refine loan strategies and enhance overall financial outcomes.
 
-```markdown
-Syntax highlighted code block
+### Difficulties Encountered Along the Way
 
-# Header 1
-## Header 2
-### Header 3
+* **Class Imbalance:** The dataset exhibited a significant imbalance, with far fewer defaulters compared to non-defaulters. Techniques such as resampling methods (oversampling, undersampling, and both) and class weighting were necessary to address this.
 
-- Bulleted
-- List
+* **Feature Engineering Challenges:** Identifying impactful features from the application_train dataset and deciding which transformations would improve model performance required experimentation.
 
-1. Numbered
-2. List
+* **Computational Complexity:** Training Random Forest and gradient boosting models like XGBoost and LightGBM required substantial computational resources, especially during hyperparameter tuning for LightGBM.
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Roadmap
-
-This project has been discontinued and is no longer actively maintained. No new features or fixes will be added. If you're interested in contributing, feel free to fork the repository and customize it to your needs.
+* **Evaluation Complexity:** Interpreting the AUC-ROC score in the context of business decisions and understanding trade-offs between sensitivity and specificity was critical.
 ___
 
 ### References
