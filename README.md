@@ -27,7 +27,9 @@ The models were evaluated using the Area Under the Receiver Operating Characteri
 
 **1. Analysis and Modeling:**
 
-* Conducted data exploration and preprocessing, including handling missing values, encoding categorical features, and identifying and removing near-zero variance predictors.
+* Conducted data exploration and preprocessing, including handling missing values, encoding categorical features, and identifying and removing near-zero variance predictors before splitting the dataset into training and testing sets.
+  
+* Random Forest was utilized to identify the most important predictors, ensuring the model focused on the most relevant variables.
 
 * Built and fine-tuned multiple machine learning models such as Naive Bayes, Logistic Regression, Random Forest, and Gradient Boosting to achieve optimal predictions.
 
