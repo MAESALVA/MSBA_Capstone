@@ -41,9 +41,9 @@ The models were evaluated using the Area Under the Receiver Operating Characteri
 
 * Applied the LightGBM model predictions to the test dataset and:
   
-* Identified distinct risk profiles (high, medium, and low risk) with detailed characteristics.
-  
-* Enhanced profiles with simulations and summarized them using repayment and profitability metrics.
+  - Identified distinct risk profiles (high, medium, and low risk) with detailed characteristics.
+    
+  - Enhanced profiles with simulations and summarized them using repayment and profitability metrics.
 ___
 
 
