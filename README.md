@@ -23,20 +23,25 @@ Key outputs of the solution include:
 
 ### Contribution to the Project
 
-* Conducted data exploration and preprocessing, including handling missing values, encoding categorical features, and scaling numerical variables.
+**1. Analysis and Modeling:**
+
+* Conducted data exploration and preprocessing, including handling missing values, encoding categorical features, and identifying and removing near-zero variance predictors.
+
+* Built and fine-tuned multiple machine learning models such as Naive Bayes, Logistic Regression, Random Forest, and Gradient Boosting to achieve optimal predictions.
 
 * Engineered meaningful features to improve the model's predictive capabilities.
+  
+**2. Performance Evaluation:**
 
-* Built and fine-tuned multiple machine learning models, including logistic regression and tree-based algorithms (Random Forest and XGBoost).
-* 
 * Analyzed model performance using the AUC-ROC metric and selected the best-performing model for deployment.
 
-
+* Applied the LightGBM model predictions to the test dataset and:
+  
+* Identified distinct risk profiles (high, medium, and low risk) with detailed characteristics.
+  
+* Enhanced profiles with simulations and summarized them using repayment and profitability metrics.
 ___
 
-You can use the editor on GitHub to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
 ### The Business Value of the Solution
 This project provides substantial value to Home Credit Group by:
@@ -58,6 +63,25 @@ This project provides substantial value to Home Credit Group by:
 * **Computational Complexity:** Training Random Forest and gradient boosting models like XGBoost and LightGBM required substantial computational resources, especially during hyperparameter tuning for LightGBM.
 
 * **Evaluation Complexity:** Interpreting the AUC-ROC score in the context of business decisions and understanding trade-offs between sensitivity and specificity was critical.
+
+### What I Learned in the Project
+
+* **Technical Skills:**
+
+* Feature engineering and data preprocessing techniques.
+* Implementation and tuning of machine learning models using R.
+* Evaluation of models using metrics like AUC-ROC and precision-recall.
+
+* **Business Insights:**
+
+* The importance of tailoring financial products to underserved populations.
+* Balancing technical accuracy with business practicality in predictive modeling.
+
+* **Personal Growth:**
+  
+* Problem-solving in the face of data challenges, such as missing values and class imbalances.
+* Communicate technical results to non-technical stakeholders.
+
 ___
 
 ### References
