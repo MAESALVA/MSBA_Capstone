@@ -12,6 +12,10 @@ The solution implemented machine learning models to accurately predict repayment
 
 The models were evaluated using the Area Under the Receiver Operating Characteristic (AUC-ROC) curve. After feature engineering, addressing class imbalance with SMOTE, ROSE, and applying class weights, and grid search for the best parameters, the LightGBM model emerged as the best-performing model, achieving an average AUC of 0.7350004 and Kaggle Score of 0.703 (Private Score).
 
+![Kaggle Score]("C:\Users\estef\OneDrive\Escritorio\MSBA UofU\FALL 2024\MSBA Capstone\submission_2.png")
+*Figure: Kaggle Private Score of 0.703 achieved using LightGBM.*
+
+
 **Key outputs of the solution include:**
 
 1. Identification of three distinct risk profiles: high, medium, and low risk, along with their characteristics defined as persona profiles.
