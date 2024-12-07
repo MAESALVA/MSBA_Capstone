@@ -10,7 +10,7 @@ The **Home Credit Default Risk** project aims to enhance loan accessibility for 
 
 The solution implemented machine learning models to accurately predict repayment abilities. Various statistical methods were used, including Naive Bayes, Logistic Regression, Random Forests, and advanced techniques like gradient boosting models (XGBoost and LightGBM).
 
-The models were evaluated using the Area Under the Receiver Operating Characteristic (AUC-ROC) curve. After feature engineering, applying class weights, and grid search for the best parameters, the LightGBM model emerged as the best-performing model, achieving an average AUC of 0.7350004 and Kaggle Score of 0.703 (Private Score).
+The models were evaluated using the Area Under the Receiver Operating Characteristic (AUC-ROC) curve. After feature engineering, addressing class imbalance with SMOTE, ROSE, and applying class weights, and grid search for the best parameters, the LightGBM model emerged as the best-performing model, achieving an average AUC of 0.7350004 and Kaggle Score of 0.703 (Private Score).
 
 **Key outputs of the solution include:**
 
