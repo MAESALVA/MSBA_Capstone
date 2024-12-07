@@ -94,6 +94,5 @@ ___
 
 ### References
 
-[1] Jekyll theme "Minimal" for GitHub Pages: https://github.com/pages-themes/minimal (CC0 1.0 Universal License)
-<br>[2] Home Credit Default Risk : https://www.kaggle.com/competitions/home-credit-default-risk/overview
-<br>[3] 
+[1] Home Credit Default Risk : https://www.kaggle.com/competitions/home-credit-default-risk/overview
+<br>[2] Jekyll theme "Minimal" for GitHub Pages: https://github.com/pages-themes/minimal (CC0 1.0 Universal License)
